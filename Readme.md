@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм»
 
 * Студент: [Арсен Муслимов](https://up.htmlacademy.ru/javascript-individual/2/user/2590827).
-* Наставник: `Неизвестно`.
+* Наставник: [Александр Сударев](https://htmlacademy.ru/profile/id1152185).
 
 ---
 

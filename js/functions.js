@@ -8,7 +8,7 @@ checkStringLength('проверяемая строка', 10);
 
 
 function isPalindrome(string) {
-  let normalized = string.replaceAll(' ', '').toLowerCase();
+  const normalized = string.replaceAll(' ', '').toLowerCase();
   let reversed = '';
 
   for (let i = normalized.length - 1; i >= 0; i--) {
@@ -29,8 +29,8 @@ function extractNumber(string) {
   let result = '';
 
   for (let i = 0; i < string.length; i++) {
-    let char = string[i];
-    let number = parseInt(char);
+    const char = string[i];
+    const number = parseInt(char, 10);
 
     if (!Number.isNaN(number)) {
       result += number;
@@ -41,7 +41,7 @@ function extractNumber(string) {
     return NaN;
   }
 
-  return parseInt(result);
+  return parseInt(result, 10);
 }
 
 extractNumber('2023 год');

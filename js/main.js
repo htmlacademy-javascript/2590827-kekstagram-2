@@ -27,6 +27,7 @@ function createPhoto (id) {
 
 const photos = Array.from({ length: 25 }, (_, i) => createPhoto(i + 1));
 
+
 function createComment(id) {
   const messageCount = getRandomInt(1, 2);
   let message = '';
@@ -43,3 +44,6 @@ function createComment(id) {
     name: NAMES[getRandomInt(0, NAMES.length - 1)]
   };
 }
+
+// eslint-disable-next-line no-console
+console.log(photos);

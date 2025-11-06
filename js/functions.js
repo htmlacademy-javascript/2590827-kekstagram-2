@@ -52,3 +52,27 @@ extractNumber('а я томат');
 extractNumber(2023);
 extractNumber(-1);
 extractNumber(1.5);
+
+
+const timeToMinutes = (time) => {
+  const parts = time.split(':');
+  const hours = Number(parts[0]);
+  const minutes = Number(parts[1]);
+  return hours * 60 + minutes;
+};
+
+const isMeetingWithinWorkday = (workDayStart, workDayEnd, meetingStartTime, meetingDuration) => {
+  const workStart = timeToMinutes(workDayStart);
+  const workEnd = timeToMinutes(workDayEnd);
+  const meetingStart = timeToMinutes(meetingStartTime);
+
+  const meetingEnd = meetingStart + meetingDuration;
+
+  return meetingStart >= workStart && meetingEnd <= workEnd;
+};
+
+isMeetingWithinWorkday('08:00', '17:30', '14:00', 90);
+isMeetingWithinWorkday('8:0', '10:0', '8:0', 120);
+isMeetingWithinWorkday('08:00', '14:30', '14:00', 90);
+isMeetingWithinWorkday('14:00', '17:30', '08:0', 90);
+isMeetingWithinWorkday('8:00', '17:30', '08:00', 900);

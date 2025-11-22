@@ -1,4 +1,4 @@
 import { photos } from './data.js';
+import { renderPictures } from './thumbnails.js';
 
-// eslint-disable-next-line no-console
-console.log(photos);
+renderPictures(photos);

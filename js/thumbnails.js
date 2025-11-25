@@ -1,3 +1,5 @@
+import { openBigPicture } from './big-picture.js';
+
 const picturesContainer = document.querySelector('.pictures');
 
 const pictureTemplate = document
@@ -25,6 +27,11 @@ function renderThumbnails(photos) {
 
   photos.forEach((photo) => {
     const pictureElement = createPictureElement(photo);
+    pictureElement.addEventListener('click', (evt) => {
+      evt.preventDefault();
+      openBigPicture(photo);
+    });
+
     fragment.append(pictureElement);
   });
 

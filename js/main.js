@@ -3,6 +3,7 @@ import { renderThumbnails } from './thumbnails.js';
 import { initForm } from './form.js';
 import { initScale } from './scale.js';
 import { initEffects } from './effects.js';
+import { initFilters } from './filters.js';
 
 const showDataError = () => {
   const template = document.querySelector('#data-error').content.querySelector('.data-error');
@@ -13,7 +14,10 @@ const showDataError = () => {
 };
 
 getData()
-  .then((photos) => renderThumbnails(photos))
+  .then((photos) => {
+    renderThumbnails(photos);
+    initFilters(photos);
+  })
   .catch(showDataError);
 
 initForm();

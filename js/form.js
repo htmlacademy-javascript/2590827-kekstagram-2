@@ -11,6 +11,10 @@ const submitButton = uploadForm.querySelector('.img-upload__submit');
 const hashtagsField = uploadForm.querySelector('.text__hashtags');
 const commentField = uploadForm.querySelector('.text__description');
 
+const imagePreview = uploadForm.querySelector('.img-upload__preview img');
+const effectsPreviews = uploadForm.querySelectorAll('.effects__preview');
+const DEFAULT_IMAGE_SRC = imagePreview.src;
+
 const successTemplate = document.querySelector('#success').content.querySelector('.success');
 const errorTemplate = document.querySelector('#error').content.querySelector('.error');
 
@@ -35,21 +39,40 @@ let isFormResetting = false;
 let activeMessage = null;
 let activeMessageButton = null;
 
+function updateImagePreviews() {
+  const file = fileField.files[0];
+
+  if (!file) {
+    return;
+  }
+
+  const fileUrl = URL.createObjectURL(file);
+
+  imagePreview.src = fileUrl;
+
+  effectsPreviews.forEach((preview) => {
+    preview.style.backgroundImage = `url(${fileUrl})`;
+  });
+}
+
 function getHashtagsArray(value) {
-  return value
-    .trim()
-    .split(' ')
-    .filter((tag) => tag.trim().length > 0);
+  return value.trim().split(' ').filter((tag) => tag.trim().length > 0);
 }
 
 function resetFormState() {
   isFormResetting = true;
   uploadForm.reset();
   isFormResetting = false;
+
   fileField.value = '';
   pristine.reset();
   resetScale();
   resetEffects();
+
+  imagePreview.src = DEFAULT_IMAGE_SRC;
+  effectsPreviews.forEach((preview) => {
+    preview.style.backgroundImage = '';
+  });
 }
 
 function closeMessage() {
@@ -124,6 +147,7 @@ function onDocumentKeydown(evt) {
 
 function onFileFieldChange() {
   if (fileField.files.length > 0) {
+    updateImagePreviews();
     openUploadOverlay();
   }
 }
@@ -166,9 +190,9 @@ function isHashtagUnique(value) {
   }
 
   const hashtags = getHashtagsArray(value).map((tag) => tag.toLowerCase());
-  const uniqueHashtags = new Set(hashtags);
+  const unique = new Set(hashtags);
 
-  return uniqueHashtags.size === hashtags.length;
+  return unique.size === hashtags.length;
 }
 
 function isCommentLengthValid(value) {

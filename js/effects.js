@@ -1,7 +1,5 @@
-
 const uploadForm = document.querySelector('.img-upload__form');
 const imagePreview = uploadForm.querySelector('.img-upload__preview img');
-
 const effectsList = uploadForm.querySelector('.effects__list');
 const effectLevelContainer = uploadForm.querySelector('.img-upload__effect-level');
 const effectLevelSlider = uploadForm.querySelector('.effect-level__slider');
@@ -96,7 +94,6 @@ function onEffectsListChange(evt) {
   } else {
     effectLevelContainer.classList.remove('hidden');
     updateSliderSettings(currentEffect);
-
     effectLevelSlider.noUiSlider.set(currentEffect.max);
   }
 }
@@ -120,9 +117,7 @@ function initEffects() {
   });
 
   effectLevelSlider.noUiSlider.on('update', onSliderUpdate);
-
   resetEffects();
-
   effectsList.addEventListener('change', onEffectsListChange);
 }
 

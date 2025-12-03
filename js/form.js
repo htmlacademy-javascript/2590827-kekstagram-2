@@ -1,3 +1,4 @@
+import { sendData } from './api.js';
 import { resetScale } from './scale.js';
 import { resetEffects } from './effects.js';
 
@@ -6,15 +7,22 @@ const uploadForm = document.querySelector('.img-upload__form');
 const uploadOverlay = uploadForm.querySelector('.img-upload__overlay');
 const fileField = uploadForm.querySelector('.img-upload__input');
 const cancelButton = uploadForm.querySelector('.img-upload__cancel');
-
+const submitButton = uploadForm.querySelector('.img-upload__submit');
 const hashtagsField = uploadForm.querySelector('.text__hashtags');
 const commentField = uploadForm.querySelector('.text__description');
+
+const successTemplate = document.querySelector('#success').content.querySelector('.success');
+const errorTemplate = document.querySelector('#error').content.querySelector('.error');
 
 const HASHTAG_MAX_COUNT = 5;
 const HASHTAG_MAX_LENGTH = 20;
 const COMMENT_MAX_LENGTH = 140;
 
 const HASHTAG_REGEX = /^#[a-zа-яё0-9]+$/i;
+const SubmitButtonText = {
+  IDLE: 'Опубликовать',
+  SENDING: 'Публикую...',
+};
 
 const pristine = new Pristine(uploadForm, {
   classTo: 'img-upload__field-wrapper',
@@ -23,6 +31,10 @@ const pristine = new Pristine(uploadForm, {
   errorTextClass: 'pristine-error'
 });
 
+let isFormResetting = false;
+let activeMessage = null;
+let activeMessageButton = null;
+
 function getHashtagsArray(value) {
   return value
     .trim()
@@ -30,6 +42,62 @@ function getHashtagsArray(value) {
     .filter((tag) => tag.trim().length > 0);
 }
 
+function resetFormState() {
+  isFormResetting = true;
+  uploadForm.reset();
+  isFormResetting = false;
+  fileField.value = '';
+  pristine.reset();
+  resetScale();
+  resetEffects();
+}
+
+function closeMessage() {
+  if (!activeMessage) {
+    return;
+  }
+
+  activeMessage.remove();
+  document.removeEventListener('keydown', onMessageDocumentKeydown);
+  activeMessage.removeEventListener('click', onMessageClick);
+
+  if (activeMessageButton) {
+    activeMessageButton.removeEventListener('click', closeMessage);
+  }
+
+  activeMessage = null;
+  activeMessageButton = null;
+}
+
+function onMessageDocumentKeydown(evt) {
+  if (evt.key === 'Escape') {
+    evt.preventDefault();
+    evt.stopPropagation();
+    closeMessage();
+  }
+}
+
+function onMessageClick(evt) {
+  if (evt.target === activeMessage) {
+    closeMessage();
+  }
+}
+
+function showMessage(template) {
+  closeMessage();
+
+  activeMessage = template.cloneNode(true);
+  activeMessageButton = activeMessage.querySelector('button');
+
+  document.body.append(activeMessage);
+
+  document.addEventListener('keydown', onMessageDocumentKeydown);
+  activeMessage.addEventListener('click', onMessageClick);
+
+  if (activeMessageButton) {
+    activeMessageButton.addEventListener('click', closeMessage);
+  }
+}
 
 function openUploadOverlay() {
   uploadOverlay.classList.remove('hidden');
@@ -42,19 +110,13 @@ function closeUploadOverlay() {
   uploadOverlay.classList.add('hidden');
   body.classList.remove('modal-open');
 
-  uploadForm.reset();
-  fileField.value = '';
-
-  pristine.reset();
-
-  resetScale();
-  resetEffects();
+  resetFormState();
 
   document.removeEventListener('keydown', onDocumentKeydown);
 }
 
 function onDocumentKeydown(evt) {
-  if (evt.key === 'Escape') {
+  if (evt.key === 'Escape' && !activeMessage) {
     evt.preventDefault();
     closeUploadOverlay();
   }
@@ -76,7 +138,6 @@ function onFieldKeydown(evt) {
     evt.stopPropagation();
   }
 }
-
 
 function isHashtagValidFormat(value) {
   if (!value) {
@@ -110,20 +171,54 @@ function isHashtagUnique(value) {
   return uniqueHashtags.size === hashtags.length;
 }
 
-
 function isCommentLengthValid(value) {
   return value.length <= COMMENT_MAX_LENGTH;
 }
 
+function blockSubmitButton() {
+  submitButton.disabled = true;
+  submitButton.textContent = SubmitButtonText.SENDING;
+}
+
+function unblockSubmitButton() {
+  submitButton.disabled = false;
+  submitButton.textContent = SubmitButtonText.IDLE;
+}
 
 function onFormSubmit(evt) {
+  evt.preventDefault();
+
   const isValid = pristine.validate();
 
   if (!isValid) {
-    evt.preventDefault();
+    return;
   }
+
+  const formData = new FormData(evt.target);
+
+  blockSubmitButton();
+
+  sendData(formData)
+    .then(() => {
+      closeUploadOverlay();
+      showMessage(successTemplate);
+    })
+    .catch(() => {
+      showMessage(errorTemplate);
+    })
+    .finally(() => {
+      unblockSubmitButton();
+    });
 }
 
+function onFormReset(evt) {
+  if (isFormResetting) {
+    return;
+  }
+
+  evt.preventDefault();
+  closeUploadOverlay();
+}
 
 function initForm() {
   fileField.addEventListener('change', onFileFieldChange);
@@ -157,6 +252,7 @@ function initForm() {
   );
 
   uploadForm.addEventListener('submit', onFormSubmit);
+  uploadForm.addEventListener('reset', onFormReset);
 }
 
 export { initForm };

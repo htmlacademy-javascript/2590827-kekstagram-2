@@ -25,6 +25,8 @@ function createPictureElement(photo) {
 function renderThumbnails(photos) {
   const fragment = document.createDocumentFragment();
 
+  picturesContainer.querySelectorAll('.picture').forEach((picture) => picture.remove());
+
   photos.forEach((photo) => {
     const pictureElement = createPictureElement(photo);
     pictureElement.addEventListener('click', (evt) => {

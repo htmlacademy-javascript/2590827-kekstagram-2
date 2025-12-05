@@ -64,14 +64,16 @@ function updateSliderSettings(effect) {
 }
 
 function applyEffect(value) {
-  effectLevelField.value = value;
+  const numericValue = parseFloat(value);
+
+  effectLevelField.value = numericValue;
 
   if (currentEffect.name === 'none') {
     imagePreview.style.filter = 'none';
     return;
   }
 
-  imagePreview.style.filter = currentEffect.getStyle(value);
+  imagePreview.style.filter = currentEffect.getStyle(numericValue);
 }
 
 function onSliderUpdate(values) {
